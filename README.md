@@ -6,9 +6,10 @@ A web application that helps users visualize how furniture would look in their r
 
 ✨ **Room Upload** - Upload an image of your room  
 🛋️ **Furniture Input** - Either describe furniture or upload an image  
-🤖 **AI Visualization** - Uses Google Gemini API to generate realistic visualizations  
+🤖 **AI Visualization** - Uses Google Gemini API for analysis and Puter.js for image generation  
 💭 **Custom Details** - Add style preferences and additional notes  
 📱 **Responsive Design** - Works on desktop and mobile devices  
+🎨 **Image Generation** - Creates realistic furniture visualizations using Puter.js  
 
 ## Project Structure
 
@@ -54,9 +55,10 @@ cd server
 npm install
 ```
 
-3. Create a `.env` file with your Gemini API key:
+3. Create a `.env` file with your API keys:
 ```env
-GEMINI_API_KEY=your_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+PUTER_API_KEY=your_puter_api_key_here
 ```
 
 4. Start the server:
@@ -121,12 +123,14 @@ The frontend will run on `http://localhost:3000`
 **Backend:**
 - Node.js & Express
 - Google Generative AI
+- Puter.js (Image Generation)
 - express-fileupload
 
 ## Requirements
 
 - Node.js v14+
 - Google Gemini API key (get it from [Google AI Studio](https://aistudio.google.com/))
+- Puter API key (get it from [Puter.com](https://puter.com/))
 - Modern web browser
 
 ## Environment Variables
@@ -134,6 +138,7 @@ The frontend will run on `http://localhost:3000`
 ### Server `.env`
 ```env
 GEMINI_API_KEY=your_gemini_api_key
+PUTER_API_KEY=your_puter_api_key
 ```
 
 ## Running with Docker

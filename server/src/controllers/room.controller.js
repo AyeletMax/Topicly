@@ -1,4 +1,5 @@
-const { generateRoomVisualization, generateVisualizationImage } = require("../services/gemini.service");
+const { generateRoomVisualization } = require("../services/gemini.service");
+const { generateImage } = require("../services/puter.service");
 const fs = require('fs');
 const path = require('path');
 
@@ -60,20 +61,16 @@ exports.visualizeRoomWithFurniture = async (req, res) => {
     console.log('📸 Image prompt extracted');
     console.log('Prompt:', imagePrompt.substring(0, 100) + '...');
 
-    // Step 2: Generate visualization image using Gemini
+    // Step 2: Generate visualization image using Puter.js
     let generatedImage = null;
-    let imageBase64 = null;
     
     try {
-      console.log('🎨 Generating image using Gemini...');
-      const imageResult = await generateVisualizationImage(imagePrompt);
+      console.log('🎨 Generating image using Puter.js...');
+      const imageResult = await generateImage(imagePrompt);
       
-      if (imageResult && imageResult.imageData) {
+      if (imageResult && imageResult.success) {
         generatedImage = imageResult;
-        imageBase64 = imageResult.imageData;
         console.log('✅ Image generated successfully');
-      } else if (imageResult && imageResult.text) {
-        console.log('⚠️ Got text response instead of image:', imageResult.text.substring(0, 100));
       }
     } catch (imageError) {
       console.error('❌ Image generation error:', imageError.message);
@@ -93,10 +90,10 @@ exports.visualizeRoomWithFurniture = async (req, res) => {
       imagePrompt: imagePrompt,
     };
 
-    if (imageBase64) {
+    if (generatedImage && generatedImage.imageUrl) {
       responseData.visualizationImage = {
-        data: imageBase64,
-        mimeType: generatedImage.mimeType,
+        url: generatedImage.imageUrl,
+        data: generatedImage.imageData
       };
     }
 
