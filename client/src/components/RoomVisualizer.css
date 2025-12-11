@@ -68,6 +68,17 @@
   border-radius: 10px;
 }
 
+.placeholder-note {
+  background: #fff3cd;
+  color: #856404;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ffeaa7;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .form-section {
   margin-bottom: 30px;
 }

@@ -90,6 +90,8 @@ const RoomVisualizer = () => {
       if (response.data.visualizationImage) {
         setVisualizationImage(response.data.visualizationImage);
       }
+      
+      console.log('Response data:', response.data); // Debug log
     } catch (err) {
       setError(
         err.response?.data?.message || 
@@ -253,10 +255,17 @@ const RoomVisualizer = () => {
           {visualizationImage && (
             <div className="result-image-container">
               <img 
-                src={`data:${visualizationImage.mimeType};base64,${visualizationImage.data}`}
+                src={visualizationImage.url || visualizationImage.imageUrl || `data:${visualizationImage.mimeType || 'image/png'};base64,${visualizationImage.data || visualizationImage.imageData}`}
                 alt="Generated room visualization"
                 className="generated-image"
+                onError={(e) => {
+                  console.log('Image load error:', e);
+                  e.target.style.display = 'none';
+                }}
               />
+              {visualizationImage.isPlaceholder && (
+                <p className="placeholder-note">📝 This is a placeholder image. The actual AI-generated image will appear here when the service is fully configured.</p>
+              )}
             </div>
           )}
           <div className="result-content">

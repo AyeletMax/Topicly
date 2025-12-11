@@ -90,10 +90,14 @@ exports.visualizeRoomWithFurniture = async (req, res) => {
       imagePrompt: imagePrompt,
     };
 
-    if (generatedImage && generatedImage.imageUrl) {
+    if (generatedImage) {
       responseData.visualizationImage = {
         url: generatedImage.imageUrl,
-        data: generatedImage.imageData
+        imageUrl: generatedImage.imageUrl,
+        data: generatedImage.imageData,
+        imageData: generatedImage.imageData,
+        mimeType: generatedImage.mimeType,
+        isPlaceholder: generatedImage.isPlaceholder
       };
     }
 
