@@ -190,9 +190,16 @@
 }
 
 .links-section h3 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   color: #333;
   font-size: 1.3rem;
+}
+
+.links-subtitle {
+  margin-bottom: 1.5rem;
+  color: #666;
+  font-size: 0.95rem;
+  font-style: italic;
 }
 
 .links-grid {
@@ -219,6 +226,27 @@
   transform: translateY(-5px);
   box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
   border-color: #667eea;
+}
+
+.spotify-card {
+  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  color: white;
+  border: 2px solid #1db954;
+}
+
+.spotify-card:hover {
+  background: linear-gradient(135deg, #1ed760 0%, #1db954 100%);
+  border-color: #1ed760;
+  box-shadow: 0 5px 20px rgba(29, 185, 84, 0.4);
+}
+
+.spotify-badge {
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-top: 0.5rem;
 }
 
 .link-icon {

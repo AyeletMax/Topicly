@@ -149,7 +149,8 @@ const MoodAnalyzer = () => {
 
             {moodData.links && moodData.links.length > 0 && (
               <div className="links-section">
-                <h3>🎯 Recommended Content for Your Mood:</h3>
+                <h3>🎵 Recommended Songs for Your Mood:</h3>
+                <p className="links-subtitle">Open these Spotify playlists to listen to music that matches your mood</p>
                 <div className="links-grid">
                   {moodData.links.map((link, index) => (
                     <a
@@ -157,11 +158,11 @@ const MoodAnalyzer = () => {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="link-card"
+                      className="link-card spotify-card"
                     >
-                      <span className="link-icon">{link.icon || '🔗'}</span>
+                      <span className="link-icon">{link.icon || '🎵'}</span>
                       <span className="link-title">{link.title}</span>
-                      <span className="link-type">{link.type}</span>
+                      <span className="spotify-badge">🎧 Spotify</span>
                     </a>
                   ))}
                 </div>

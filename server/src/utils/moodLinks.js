@@ -1,87 +1,87 @@
 /**
- * Maps mood to relevant links/content recommendations
+ * Maps mood to Spotify music playlists (audio only)
  * @param {string} mood - Detected mood
  * @param {number} confidence - Confidence level (0-1)
- * @returns {Array<Object>} Array of link objects with title, url, type, icon
+ * @returns {Array<Object>} Array of Spotify playlist links
  */
 exports.getMoodLinks = (mood, confidence = 0.5) => {
   const moodLower = mood.toLowerCase();
   
-  // Base link templates by mood category
-  const linkTemplates = {
+  // Spotify playlists by mood category (audio only - no video)
+  const spotifyPlaylists = {
     happy: [
-      { title: 'Upbeat Music Playlist', url: 'https://open.spotify.com/playlist/37i9dQZF1DXdPec7aLTABCs', type: 'Music', icon: '🎵' },
-      { title: 'Funny Videos', url: 'https://www.youtube.com/results?search_query=funny+videos', type: 'Video', icon: '📺' },
-      { title: 'Positive Quotes', url: 'https://www.goodreads.com/quotes/tag/positive', type: 'Reading', icon: '📖' },
-      { title: 'Dance Workout', url: 'https://www.youtube.com/results?search_query=dance+workout', type: 'Fitness', icon: '💃' }
+      { title: 'Happy Hits', url: 'https://open.spotify.com/playlist/37i9dQZF1DXdPec7aLTABCs', type: 'Music', icon: '🎵' },
+      { title: 'Feel Good Pop', url: 'https://open.spotify.com/playlist/37i9dQZF1DX1s9bkj5AkUo', type: 'Music', icon: '😊' },
+      { title: 'Upbeat Indie', url: 'https://open.spotify.com/playlist/37i9dQZF1DX2sUQwD7tbmL', type: 'Music', icon: '🎸' },
+      { title: 'Dance Party', url: 'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M', type: 'Music', icon: '💃' }
     ],
     sad: [
-      { title: 'Calming Music', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🎵' },
-      { title: 'Inspirational Stories', url: 'https://www.ted.com/talks', type: 'Video', icon: '📺' },
-      { title: 'Self-Care Tips', url: 'https://www.helpguide.org/articles/mental-health/self-care-for-anxiety-depression-and-stress.htm', type: 'Reading', icon: '📖' },
-      { title: 'Meditation Guide', url: 'https://www.headspace.com/meditation/meditation-for-beginners', type: 'Wellness', icon: '🧘' }
+      { title: 'Sad Songs', url: 'https://open.spotify.com/playlist/37i9dQZF1DX3YSRoSdA634', type: 'Music', icon: '😢' },
+      { title: 'Melancholy Vibes', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🎹' },
+      { title: 'Emotional Ballads', url: 'https://open.spotify.com/playlist/37i9dQZF1DX7qK8ma5wgG1', type: 'Music', icon: '🎤' },
+      { title: 'Chill & Reflective', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '🌙' }
     ],
     excited: [
-      { title: 'Energetic Music', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76t638V6CA8', type: 'Music', icon: '🎵' },
-      { title: 'Adventure Ideas', url: 'https://www.buzzfeed.com/tag/adventure', type: 'Reading', icon: '📖' },
-      { title: 'Motivational Videos', url: 'https://www.youtube.com/results?search_query=motivational+speeches', type: 'Video', icon: '📺' },
-      { title: 'Productivity Tips', url: 'https://todoist.com/productivity-methods', type: 'Productivity', icon: '⚡' }
+      { title: 'Energy Boost', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76t638V6CA8', type: 'Music', icon: '⚡' },
+      { title: 'Workout Motivation', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76Wlfd25lzL', type: 'Music', icon: '💪' },
+      { title: 'High Energy Pop', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🔥' },
+      { title: 'Pump Up Songs', url: 'https://open.spotify.com/playlist/37i9dQZF1DX1lVhptIYRda', type: 'Music', icon: '🎧' }
     ],
     calm: [
-      { title: 'Peaceful Music', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '🎵' },
-      { title: 'Nature Sounds', url: 'https://www.youtube.com/results?search_query=nature+sounds', type: 'Audio', icon: '🌿' },
-      { title: 'Mindfulness Exercises', url: 'https://www.mindful.org/meditation/mindfulness-getting-started/', type: 'Wellness', icon: '🧘' },
-      { title: 'Reading Recommendations', url: 'https://www.goodreads.com/genre/calm', type: 'Reading', icon: '📖' }
+      { title: 'Peaceful Piano', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '🎹' },
+      { title: 'Calm & Focused', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🧘' },
+      { title: 'Ambient Relaxation', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4u5kfs0cCFN', type: 'Music', icon: '🌊' },
+      { title: 'Soft Acoustic', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🎸' }
     ],
     anxious: [
-      { title: 'Calming Sounds', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '🎵' },
-      { title: 'Breathing Exercises', url: 'https://www.healthline.com/health/breathing-exercise', type: 'Wellness', icon: '🫁' },
-      { title: 'Stress Relief Techniques', url: 'https://www.mayoclinic.org/healthy-lifestyle/stress-management/in-depth/stress-relief/art-20044457', type: 'Reading', icon: '📖' },
-      { title: 'Guided Meditation', url: 'https://www.headspace.com/meditation/meditation-for-anxiety', type: 'Wellness', icon: '🧘' }
+      { title: 'Calming Sounds', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '🫁' },
+      { title: 'Stress Relief', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🌿' },
+      { title: 'Meditation Music', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4u5kfs0cCFN', type: 'Music', icon: '🧘' },
+      { title: 'Nature Sounds', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '🌲' }
     ],
     tired: [
-      { title: 'Relaxing Music', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '🎵' },
-      { title: 'Sleep Stories', url: 'https://www.calm.com/sleep', type: 'Audio', icon: '😴' },
-      { title: 'Rest Tips', url: 'https://www.sleepfoundation.org/sleep-hygiene', type: 'Reading', icon: '📖' },
-      { title: 'Power Nap Guide', url: 'https://www.healthline.com/health/power-nap', type: 'Wellness', icon: '💤' }
+      { title: 'Sleep & Relax', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '😴' },
+      { title: 'Bedtime Stories', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🌙' },
+      { title: 'Deep Sleep', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4u5kfs0cCFN', type: 'Music', icon: '💤' },
+      { title: 'Peaceful Night', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '⭐' }
     ],
     energetic: [
-      { title: 'Workout Playlist', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76t638V6CA8', type: 'Music', icon: '🎵' },
-      { title: 'Fitness Routines', url: 'https://www.youtube.com/results?search_query=home+workout', type: 'Video', icon: '💪' },
-      { title: 'Energy Boost Tips', url: 'https://www.healthline.com/nutrition/how-to-increase-energy', type: 'Reading', icon: '📖' },
-      { title: 'Active Games', url: 'https://www.nintendo.com/games/', type: 'Entertainment', icon: '🎮' }
+      { title: 'Workout Mix', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76t638V6CA8', type: 'Music', icon: '💪' },
+      { title: 'Power Hour', url: 'https://open.spotify.com/playlist/37i9dQZF1DX1lVhptIYRda', type: 'Music', icon: '⚡' },
+      { title: 'High Energy', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🔥' },
+      { title: 'Pump It Up', url: 'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M', type: 'Music', icon: '🎧' }
     ]
   };
 
   // Determine mood category
-  let selectedLinks = [];
+  let selectedPlaylists = [];
   if (moodLower.includes('happy') || moodLower.includes('joy') || moodLower.includes('cheerful')) {
-    selectedLinks = linkTemplates.happy;
+    selectedPlaylists = spotifyPlaylists.happy;
   } else if (moodLower.includes('sad') || moodLower.includes('down') || moodLower.includes('melancholy')) {
-    selectedLinks = linkTemplates.sad;
+    selectedPlaylists = spotifyPlaylists.sad;
   } else if (moodLower.includes('excited') || moodLower.includes('enthusiastic') || moodLower.includes('thrilled')) {
-    selectedLinks = linkTemplates.excited;
+    selectedPlaylists = spotifyPlaylists.excited;
   } else if (moodLower.includes('calm') || moodLower.includes('peaceful') || moodLower.includes('serene')) {
-    selectedLinks = linkTemplates.calm;
+    selectedPlaylists = spotifyPlaylists.calm;
   } else if (moodLower.includes('anxious') || moodLower.includes('worried') || moodLower.includes('nervous')) {
-    selectedLinks = linkTemplates.anxious;
+    selectedPlaylists = spotifyPlaylists.anxious;
   } else if (moodLower.includes('tired') || moodLower.includes('exhausted') || moodLower.includes('sleepy')) {
-    selectedLinks = linkTemplates.tired;
+    selectedPlaylists = spotifyPlaylists.tired;
   } else if (moodLower.includes('energetic') || moodLower.includes('active') || moodLower.includes('vibrant')) {
-    selectedLinks = linkTemplates.energetic;
+    selectedPlaylists = spotifyPlaylists.energetic;
   } else {
-    // Default/neutral mood
-    selectedLinks = [
-      { title: 'Discover Music', url: 'https://open.spotify.com/browse', type: 'Music', icon: '🎵' },
-      { title: 'Explore Videos', url: 'https://www.youtube.com', type: 'Video', icon: '📺' },
-      { title: 'Read Articles', url: 'https://medium.com', type: 'Reading', icon: '📖' },
-      { title: 'Wellness Resources', url: 'https://www.headspace.com', type: 'Wellness', icon: '🧘' }
+    // Default/neutral mood - general music discovery
+    selectedPlaylists = [
+      { title: 'Discover Weekly', url: 'https://open.spotify.com/playlist/37i9dQZ1DXcBWIGoYBM5M', type: 'Music', icon: '🎵' },
+      { title: 'Today\'s Top Hits', url: 'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M', type: 'Music', icon: '🔥' },
+      { title: 'Chill Hits', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '🌊' },
+      { title: 'Pop Mix', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🎤' }
     ];
   }
 
-  // Adjust number of links based on confidence
-  const numLinks = confidence > 0.7 ? selectedLinks.length : Math.max(2, Math.floor(selectedLinks.length * confidence));
+  // Adjust number of playlists based on confidence (minimum 2, maximum all)
+  const numPlaylists = confidence > 0.7 ? selectedPlaylists.length : Math.max(2, Math.floor(selectedPlaylists.length * confidence));
   
-  return selectedLinks.slice(0, numLinks);
+  return selectedPlaylists.slice(0, numPlaylists);
 };
 
