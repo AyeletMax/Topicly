@@ -5,15 +5,14 @@ exports.generateContent = async (req, res) => {
   try {
     const { topic, types } = req.body;
 
-    const prompt = `Create event materials based on topic: ${topic}.
-Types needed: ${types.join(", ")}.
-Generate high‑quality output.`;
-
-    const result = await askGemini(prompt);
+    // Fallback response without Gemini
+    const result = {
+      text: `Event materials for ${topic}:\n\n${types.map(type => `• ${type.charAt(0).toUpperCase() + type.slice(1)}: Professional ${type} for ${topic} event`).join('\n')}`
+    };
 
     res.json(result);
   } catch (err) {
-    res.status(500).json({ error: "Gemini request failed", message: err.message });
+    res.status(500).json({ error: "Content generation failed", message: err.message });
   }
 };
 
