@@ -1,17 +1,115 @@
-# Topicly - Room Furniture Visualizer
+# 🎭 Mood Analyzer - AI-Powered Mood Detection
 
-A web application that helps users visualize how furniture would look in their room using AI-powered image generation.
+A production-ready web application that analyzes human emotions from images using Google Gemini Vision API and provides personalized content recommendations based on detected mood.
 
-## Features
+## 🎯 Project Overview
 
-✨ **Room Upload** - Upload an image of your room  
-🛋️ **Furniture Input** - Either describe furniture or upload an image  
-🤖 **AI Visualization** - Uses Google Gemini API for analysis and Puter.js for image generation  
-💭 **Custom Details** - Add style preferences and additional notes  
-📱 **Responsive Design** - Works on desktop and mobile devices  
-🎨 **Image Generation** - Creates realistic furniture visualizations using Puter.js  
+This is a full-stack application built as a final project that demonstrates:
+- **AI Integration**: Deep integration with Google Gemini Vision API for mood analysis
+- **Modern Frontend**: React-based user interface with beautiful UX
+- **Robust Backend**: Node.js/Express server with proper error handling
+- **Docker Support**: Full containerization for easy deployment
+- **Testing**: Unit and integration tests
+- **CI/CD Ready**: Structured for continuous integration/deployment
 
-## Project Structure
+## ✨ Features
+
+- 📸 **Image Upload**: Upload photos to analyze mood
+- 🤖 **AI Mood Detection**: Powered by Google Gemini Vision API
+- 🎯 **Personalized Recommendations**: Get curated links (music, videos, articles) based on your mood
+- 📊 **Confidence Scoring**: See how confident the AI is in its analysis
+- 🎨 **Beautiful UI**: Modern, responsive design
+- 🐳 **Dockerized**: Run everything in containers
+- ✅ **Tested**: Comprehensive test coverage
+
+## 🏗️ Architecture
+
+```
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│   React     │─────────▶│  Express    │─────────▶│   Gemini    │
+│  Frontend   │  HTTP    │   Backend   │   API    │  Vision API │
+└─────────────┘         └─────────────┘         └─────────────┘
+                              │
+                              ▼
+                        ┌─────────────┐
+                        │  Mood Links │
+                        │   Mapper    │
+                        └─────────────┘
+```
+
+## 📋 Prerequisites
+
+- Node.js 18+ and npm
+- Docker and Docker Compose
+- Google Gemini API Key ([Get it here](https://aistudio.google.com/app/apikey))
+
+## 🚀 Quick Start
+
+### 1. Clone and Setup
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd Topicly
+
+# Create .env file for server
+cd server
+cp .env.example .env
+# Edit .env and add your GEMINI_API_KEY
+```
+
+### 2. Environment Variables
+
+Create `server/.env`:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+PORT=3001
+NODE_ENV=development
+```
+
+### 3. Run with Docker (Recommended)
+
+```bash
+# From project root
+docker-compose up --build
+```
+
+The application will be available at:
+- Frontend: http://localhost
+- Backend API: http://localhost:3001
+
+### 4. Run Locally (Development)
+
+**Backend:**
+```bash
+cd server
+npm install
+npm start
+```
+
+**Frontend:**
+```bash
+cd client
+npm install
+npm start
+```
+
+## 🧪 Testing
+
+### Backend Tests
+```bash
+cd server
+npm test
+npm run test:coverage
+```
+
+### Frontend Tests
+```bash
+cd client
+npm test
+```
+
+## 📁 Project Structure
 
 ```
 Topicly/
@@ -19,134 +117,130 @@ Topicly/
 │   ├── public/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── RoomVisualizer.js
-│   │   │   └── RoomVisualizer.css
+│   │   │   └── MoodAnalyzer.js
 │   │   ├── App.js
-│   │   ├── App.css
-│   │   ├── index.js
-│   │   └── index.css
+│   │   └── index.js
+│   ├── Dockerfile
 │   └── package.json
-├── server/                 # Express backend
+├── server/                 # Node.js backend
 │   ├── src/
 │   │   ├── controllers/
-│   │   │   ├── event.controller.js
-│   │   │   └── room.controller.js
+│   │   │   └── mood.controller.js
 │   │   ├── routes/
-│   │   │   ├── event.routes.js
-│   │   │   └── room.routes.js
-│   │   └── services/
-│   │       └── gemini.service.js
-│   ├── server.js
+│   │   │   └── mood.routes.js
+│   │   ├── services/
+│   │   │   └── gemini.service.js
+│   │   ├── utils/
+│   │   │   └── moodLinks.js
+│   │   └── server.js
+│   ├── __tests__/
+│   ├── Dockerfile
 │   └── package.json
-└── docker-compose.yml
+├── docker-compose.yml
+└── README.md
 ```
 
-## Installation & Setup
+## 🔧 API Endpoints
 
-### Backend Setup
+### POST `/api/analyze-mood`
+Analyzes mood from uploaded image.
 
-1. Navigate to the server directory:
-```bash
-cd server
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Create a `.env` file with your API keys:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-PUTER_API_KEY=your_puter_api_key_here
-```
-
-4. Start the server:
-```bash
-npm start
-```
-The server will run on `http://localhost:3001`
-
-### Frontend Setup
-
-1. Navigate to the client directory:
-```bash
-cd client
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm start
-```
-The frontend will run on `http://localhost:3000`
-
-## API Endpoints
-
-### Room Visualization
-
-**POST** `/api/rooms/visualize`
-
-**Request (multipart/form-data):**
-- `roomImage` - Room image file (required)
-- `furnitureImage` - Furniture image file (optional)
-- `furnitureDescription` - Text description of furniture (required if no image)
-- `description` - Additional style notes (optional)
+**Request:**
+- Content-Type: `multipart/form-data`
+- Body: `image` (file)
 
 **Response:**
 ```json
 {
   "success": true,
-  "visualization": "AI-generated description of how the furniture would look in the room"
+  "mood": "happy",
+  "moodEmoji": "😊",
+  "confidence": 0.85,
+  "description": "The person appears happy and cheerful...",
+  "links": [
+    {
+      "title": "Upbeat Music Playlist",
+      "url": "https://...",
+      "type": "Music",
+      "icon": "🎵"
+    }
+  ]
 }
 ```
 
-## How to Use
+## 🐳 Docker Details
 
-1. **Upload Room Image** - Click to upload a photo of your room
-2. **Choose Furniture Input** - Either describe the furniture or upload an image
-3. **Add Optional Details** - Specify style preferences (modern, minimalist, etc.)
-4. **Generate** - Click "Generate Visualization" to see the result
-5. **Review** - The AI will generate a detailed visualization
+### Build Images
+```bash
+docker-compose build
+```
 
-## Technologies Used
+### Run Containers
+```bash
+docker-compose up -d
+```
+
+### View Logs
+```bash
+docker-compose logs -f
+```
+
+### Stop Containers
+```bash
+docker-compose down
+```
+
+## 🧩 Technology Stack
 
 **Frontend:**
 - React 18
 - Axios
-- CSS3 with animations
+- CSS3 (Modern styling)
 
 **Backend:**
-- Node.js & Express
-- Google Generative AI
-- Puter.js (Image Generation)
-- express-fileupload
+- Node.js 18
+- Express.js
+- Multer (File uploads)
+- Google Generative AI SDK
+- Jest (Testing)
 
-## Requirements
+**DevOps:**
+- Docker
+- Docker Compose
+- Nginx (Production frontend)
 
-- Node.js v14+
-- Google Gemini API key (get it from [Google AI Studio](https://aistudio.google.com/))
-- Puter API key (get it from [Puter.com](https://puter.com/))
-- Modern web browser
+## 📊 AI Integration Flow
 
-## Environment Variables
+1. User uploads image → Frontend sends to Backend
+2. Backend receives image → Converts to base64
+3. Backend calls Gemini Vision API → Analyzes mood
+4. Gemini returns mood analysis → Backend processes
+5. Backend maps mood to links → Returns to Frontend
+6. Frontend displays mood + recommendations
 
-### Server `.env`
-```env
-GEMINI_API_KEY=your_gemini_api_key
-PUTER_API_KEY=your_puter_api_key
-```
+## 🎓 Project Requirements Compliance
 
-## Running with Docker
+✅ **AI Component**: Deep Gemini Vision API integration  
+✅ **Web Application**: Modern React frontend  
+✅ **Backend**: Node.js/Express with proper architecture  
+✅ **Testing**: Unit tests for backend utilities  
+✅ **Docker**: Full containerization  
+✅ **CI/CD Ready**: Structured for pipelines  
 
-```bash
-docker-compose up
-```
+## 📝 License
 
-## License
+This project is part of a final project submission.
 
-This project is part of the Topicly initiative by AyeletMax.
+## 👥 Authors
+
+[Your Name/Team Name]
+
+## 🙏 Acknowledgments
+
+- Google Gemini API for mood analysis capabilities
+- React and Node.js communities
+
+---
+
+**Built with ❤️ for final project submission**
+

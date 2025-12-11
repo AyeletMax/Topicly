@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 import './App.css';
-import RoomVisualizer from './components/RoomVisualizer';
+import MoodAnalyzer from './components/MoodAnalyzer';
 
 function App() {
   return (
     <div className="App">
-      <header className="header">
-        <h1>🛋️ Room Furniture Visualizer</h1>
-        <p>Upload your room and see how furniture looks in your space</p>
+      <header className="app-header">
+        <h1>🎭 Mood Analyzer</h1>
+        <p>Upload your photo and discover content that matches your mood</p>
       </header>
-      <main className="main">
-        <RoomVisualizer />
+      <main className="app-main">
+        <MoodAnalyzer />
       </main>
     </div>
   );
 }
 
 export default App;
+

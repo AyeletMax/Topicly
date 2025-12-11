@@ -1,52 +1,43 @@
 .App {
   min-height: 100vh;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
-.header {
+.app-header {
   text-align: center;
+  padding: 2rem 1rem;
   color: white;
-  margin-bottom: 40px;
-  animation: fadeIn 0.6s ease-in;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
 }
 
-.header h1 {
+.app-header h1 {
   font-size: 2.5rem;
-  margin: 0 0 10px 0;
+  margin-bottom: 0.5rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.header p {
+.app-header p {
   font-size: 1.1rem;
-  margin: 0;
   opacity: 0.9;
 }
 
-.main {
+.app-main {
+  flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  padding: 20px;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  align-items: flex-start;
+  padding: 2rem 1rem;
 }
 
 @media (max-width: 768px) {
-  .header h1 {
-    font-size: 1.8rem;
+  .app-header h1 {
+    font-size: 2rem;
   }
-
-  .header p {
+  
+  .app-header p {
     font-size: 1rem;
   }
 }
+
