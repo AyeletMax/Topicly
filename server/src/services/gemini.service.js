@@ -30,59 +30,187 @@ exports.analyzeMoodWithGemini = async (imagePath) => {
     };
     const mimeType = mimeTypes[ext] || 'image/jpeg';
 
-    // Initialize Gemini model
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
-    // Create prompt for mood analysis
-    const prompt = `Analyze the mood and emotional state of the person(s) in this image. 
+    // Try multiple models in order of preference (fallback if quota exceeded)
+    const modelsToTry = [
+          // Better quality, may have quota limits
+      'gemini-2.5-flash'   // Latest, but may have stricter quotas
+    ];
     
-Please provide:
-1. The primary mood/emotion detected (e.g., happy, sad, excited, calm, anxious, confident, tired, energetic, etc.)
-2. A confidence level (0.0 to 1.0) for your assessment
-3. A brief description (2-3 sentences) explaining what you observe that indicates this mood
+    let currentModelIndex = 0;
+    let model = genAI.getGenerativeModel({ 
+      model: modelsToTry[currentModelIndex],
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.9,
+        topK: 40,
+      }
+    });
+    
+    console.log(`🔄 Using model: ${modelsToTry[currentModelIndex]}`);
 
-Respond in JSON format:
+    // Enhanced prompt that forces actual image analysis
+    const prompt = `Analyze THIS SPECIFIC IMAGE. Look at the actual person(s) in the image RIGHT NOW and analyze their REAL emotional state. Do NOT give generic responses - analyze what you ACTUALLY see.
+
+CRITICAL: You must look at the image and describe what you ACTUALLY observe. Each image is different - give a UNIQUE analysis based on what you see.
+
+ANALYSIS STEPS:
+
+1. LOOK AT THE IMAGE FIRST - What do you actually see?
+   - Is there a person visible? How do they look?
+   - What is their facial expression RIGHT NOW?
+   - What is their body position?
+   - What is the context/setting?
+
+2. ANALYZE FACIAL FEATURES (be specific to THIS image):
+   - Eyes: Are they wide open, half-closed, looking up/down/away? Any wrinkles?
+   - Mouth: Is it smiling, frowning, neutral? Are corners up or down?
+   - Eyebrows: Raised, furrowed, relaxed?
+   - Overall face: Tense, relaxed, expressive, blank?
+
+3. ANALYZE BODY LANGUAGE (specific to THIS image):
+   - Posture: How is the person positioned?
+   - Shoulders: Raised, relaxed, forward?
+   - Head: Position and angle?
+   - Arms/hands: What are they doing?
+
+4. DETERMINE MOOD (choose ONE that matches what you ACTUALLY see):
+   - happy: visible smile, bright eyes, positive expression
+   - sad: downturned mouth, droopy eyes, negative expression
+   - excited: wide eyes, big smile, energetic pose
+   - calm: relaxed face, peaceful expression, composed
+   - anxious: tense face, worried expression, nervous body language
+   - confident: strong posture, direct gaze, self-assured expression
+   - tired: droopy eyes, relaxed/slumped posture, weary expression
+   - energetic: active pose, bright expression, dynamic body language
+   - neutral: minimal expression, balanced, neither positive nor negative
+
+5. CONFIDENCE (0.0-1.0):
+   - How clear and obvious is the emotion in THIS specific image?
+   - 0.9-1.0: Very obvious, clear expression
+   - 0.7-0.8: Clear but some ambiguity
+   - 0.5-0.6: Moderate clarity
+   - 0.3-0.4: Unclear, ambiguous
+   - 0.0-0.2: Very unclear
+
+6. DESCRIPTION:
+   Write 2-3 sentences describing SPECIFICALLY what you see in THIS image that indicates the mood. Be concrete and specific - mention actual features you observe.
+
+IMPORTANT: 
+- Analyze THIS specific image, not a generic person
+- Give a UNIQUE response based on what you ACTUALLY see
+- If the image shows multiple people, analyze the most prominent/central person
+- If no person is clearly visible, return mood: "neutral", confidence: 0.3
+
+OUTPUT FORMAT - JSON only, no other text:
 {
-  "mood": "the detected mood",
+  "mood": "one_word_from_list",
   "confidence": 0.0-1.0,
-  "description": "your analysis description"
+  "description": "specific description of what you see in this image"
 }`;
 
-    // Generate content with image
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: base64Image,
-          mimeType: mimeType
+    // Generate content with image - with retry logic for quota errors
+    let result;
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    while (attempts < maxAttempts) {
+      try {
+        result = await model.generateContent([
+          prompt,
+          {
+            inlineData: {
+              data: base64Image,
+              mimeType: mimeType
+            }
+          }
+        ]);
+        break; // Success, exit loop
+      } catch (apiError) {
+        attempts++;
+        
+        // Check if it's a quota error
+        const isQuotaError = apiError.message && (
+          apiError.message.includes('429') || 
+          apiError.message.includes('quota') || 
+          apiError.message.includes('Quota') ||
+          apiError.message.includes('exceeded')
+        );
+        
+        if (isQuotaError) {
+          console.warn(`⚠️ Quota exceeded for model ${modelsToTry[currentModelIndex]} (attempt ${attempts}/${maxAttempts})`);
+          
+          // Try next model in list if available
+          if (currentModelIndex < modelsToTry.length - 1) {
+            currentModelIndex++;
+            const nextModel = modelsToTry[currentModelIndex];
+            console.log(`🔄 Switching to model: ${nextModel}`);
+            model = genAI.getGenerativeModel({ 
+              model: nextModel,
+              generationConfig: {
+                temperature: 0.7,
+                topP: 0.9,
+                topK: 40,
+              }
+            });
+            attempts = 0; // Reset attempts for new model
+            continue; // Retry with new model
+          }
+          
+          // All models exhausted - extract retry delay from error
+          const retryMatch = apiError.message.match(/retry in ([\d.]+)s/i) || apiError.message.match(/(\d+\.?\d*)\s*seconds?/i);
+          const retrySeconds = retryMatch ? parseFloat(retryMatch[1]) : 60;
+          
+          throw new Error(`Quota exceeded for all models. You've used your daily free tier limit (20 requests per model). Please wait ${Math.ceil(retrySeconds)} seconds or upgrade your plan at https://ai.google.dev/pricing`);
         }
+        
+        // For other errors, throw immediately
+        throw apiError;
       }
-    ]);
+    }
+    
+    if (!result) {
+      throw new Error('Failed to generate content after multiple attempts');
+    }
 
     const response = await result.response;
     const text = response.text();
+    
+    // Log the raw response for debugging
+    console.log('📝 Raw Gemini response:', text.substring(0, 300));
 
     // Parse JSON response
     let moodData;
     try {
-      // Extract JSON from response (handle markdown code blocks if present)
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      // Try to find JSON in response - handle various formats
+      let jsonText = text.trim();
+      
+      // Remove markdown code blocks if present
+      jsonText = jsonText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+      
+      // Find JSON object
+      const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         moodData = JSON.parse(jsonMatch[0]);
+        console.log('✅ Parsed mood data:', moodData);
       } else {
         throw new Error('No JSON found in response');
       }
     } catch (parseError) {
-      // Fallback: try to extract mood from text
-      console.warn('Failed to parse JSON, using fallback parsing');
-      const moodMatch = text.match(/mood["\s:]+([^",\n}]+)/i);
-      const confidenceMatch = text.match(/confidence["\s:]+([0-9.]+)/i);
+      console.error('❌ JSON parse error:', parseError.message);
+      console.error('Full response text:', text);
+      
+      // Enhanced fallback parsing
+      const moodMatch = text.match(/["']?mood["']?\s*[:=]\s*["']?([^",\n}]+)["']?/i);
+      const confidenceMatch = text.match(/["']?confidence["']?\s*[:=]\s*([0-9.]+)/i);
+      const descMatch = text.match(/["']?description["']?\s*[:=]\s*["']?([^"]+)["']?/i);
       
       moodData = {
-        mood: moodMatch ? moodMatch[1].trim() : 'neutral',
-        confidence: confidenceMatch ? parseFloat(confidenceMatch[1]) : 0.5,
-        description: text.substring(0, 200)
+        mood: moodMatch ? moodMatch[1].trim().toLowerCase() : 'neutral',
+        confidence: confidenceMatch ? Math.min(1.0, Math.max(0.0, parseFloat(confidenceMatch[1]))) : 0.5,
+        description: descMatch ? descMatch[1].trim() : (text.substring(0, 200) || 'Unable to analyze image')
       };
+      
+      console.warn('⚠️ Using fallback parsing, mood:', moodData.mood);
     }
 
     // Map mood to emoji

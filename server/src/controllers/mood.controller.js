@@ -17,19 +17,18 @@ exports.analyzeMood = async (req, res) => {
     let moodAnalysis;
     
     try {
-      // Try Gemini Vision API first
+      // Analyze with Gemini Vision API
       console.log('🤖 Analyzing mood with Gemini Vision...');
+      console.log('📸 Image file:', req.file.filename, 'Size:', req.file.size, 'bytes');
       moodAnalysis = await analyzeMoodWithGemini(imagePath);
-      console.log('✅ Mood analysis completed:', moodAnalysis.mood);
+      console.log('✅ Mood analysis completed:');
+      console.log('   - Mood:', moodAnalysis.mood);
+      console.log('   - Confidence:', moodAnalysis.confidence);
+      console.log('   - Description length:', moodAnalysis.description?.length || 0);
     } catch (geminiError) {
-      console.log('⚠️ Gemini unavailable, using fallback');
-      // Simple fallback - return happy mood
-      moodAnalysis = {
-        mood: 'happy',
-        moodEmoji: '😊',
-        confidence: 0.7,
-        description: 'מצב רוח חיובי נבחר עבורך'
-      };
+      console.error('❌ Gemini analysis failed:', geminiError.message);
+      // Don't use fallback - throw error so user knows something is wrong
+      throw new Error(`Failed to analyze image: ${geminiError.message}. Please check your GEMINI_API_KEY and try again.`);
     }
 
     // Get recommended links based on mood

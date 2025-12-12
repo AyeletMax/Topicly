@@ -44,18 +44,33 @@ const MoodAnalyzer = () => {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          timeout: 60000, // 60 seconds timeout for AI analysis
         }
       );
 
-      setMoodData(response.data);
+      if (response.data && response.data.success !== false) {
+        setMoodData(response.data);
+        setError(null);
+      } else {
+        throw new Error(response.data?.error || 'Analysis failed');
+      }
     } catch (err) {
-      setError(
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        'Failed to analyze mood. Please try again.'
-      );
-      console.error('Error:', err);
+      console.error('Full error:', err);
+      let errorMessage = 'Failed to analyze mood. ';
+      
+      if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
+        errorMessage += 'Cannot connect to server. Make sure the backend is running on port 3001.';
+      } else if (err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
+        errorMessage += 'Request timed out. The analysis is taking too long.';
+      } else if (err.response?.status === 400) {
+        errorMessage += err.response.data?.error || 'Invalid request. Please check your image.';
+      } else if (err.response?.status === 500) {
+        errorMessage += err.response.data?.message || 'Server error. Please try again.';
+      } else {
+        errorMessage += err.response?.data?.error || err.response?.data?.message || err.message || 'Unknown error occurred.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
