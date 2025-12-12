@@ -22,24 +22,18 @@ exports.analyzeMood = async (req, res) => {
       moodAnalysis = await analyzeMoodWithGemini(imagePath);
       console.log('✅ Mood analysis completed:', moodAnalysis.mood);
     } catch (geminiError) {
-      console.log('⚠️ Gemini API unavailable, using fallback mood detection');
-      console.log('Gemini Error:', geminiError.message);
-      // Fallback: random mood selection
-      const moods = ['happy', 'sad', 'neutral', 'excited', 'calm'];
-      const randomMood = moods[Math.floor(Math.random() * moods.length)];
-      
+      console.log('⚠️ Gemini unavailable, using fallback');
+      // Simple fallback - return happy mood
       moodAnalysis = {
-        mood: randomMood,
-        moodEmoji: randomMood === 'happy' ? '😊' : randomMood === 'sad' ? '😢' : '😐',
+        mood: 'happy',
+        moodEmoji: '😊',
         confidence: 0.7,
-        description: `נראה שהמצב רוח הוא ${randomMood === 'happy' ? 'שמח' : randomMood === 'sad' ? 'עצוב' : 'נייטרלי'}`
+        description: 'מצב רוח חיובי נבחר עבורך'
       };
     }
 
     // Get recommended links based on mood
-    console.log('🎵 Getting mood links for:', moodAnalysis.mood);
     const links = getMoodLinks(moodAnalysis.mood, moodAnalysis.confidence);
-    console.log('✅ Links retrieved:', links.length, 'songs');
 
     // Clean up uploaded file
     fs.unlinkSync(imagePath);
@@ -59,7 +53,6 @@ exports.analyzeMood = async (req, res) => {
     res.json(response);
   } catch (err) {
     console.error('❌ Error:', err);
-    console.error('❌ Error stack:', err.stack);
     
     // Clean up file on error
     if (req.file && fs.existsSync(req.file.path)) {
@@ -68,9 +61,7 @@ exports.analyzeMood = async (req, res) => {
 
     res.status(500).json({
       error: 'Mood analysis failed',
-      message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      message: err.message
     });
   }
 };
-
