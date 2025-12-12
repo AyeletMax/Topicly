@@ -1,84 +1,87 @@
 /**
- * Maps mood to 30 Haredi song recommendations with working links
+ * Maps mood to Spotify music playlists (audio only)
  * @param {string} mood - Detected mood
  * @param {number} confidence - Confidence level (0-1)
- * @returns {Array<Object>} Array of 30 Haredi songs with title, artist, url
+ * @returns {Array<Object>} Array of Spotify playlist links
  */
 exports.getMoodLinks = (mood, confidence = 0.5) => {
   const moodLower = mood.toLowerCase();
   
-  const songLists = {
+  // Spotify playlists by mood category (audio only - no video)
+  const spotifyPlaylists = {
     happy: [
-      { title: 'שמח בחלקו', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'עד בלי די', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'כי אתה עמדי', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אם השם לא יבנה בית', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'שיר המעלות', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'ושמחת בחגך', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אשרי האיש', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'כל העולם כולו', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'עוד ישמע', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'הללויה', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'שבת שלום', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'ברוך השם', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אנא השם', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'יום טוב', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'שמחה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'מזמור לתודה', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'רנו צדיקים', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אור זרוע', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'טוב להודות', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'שירו לה׳', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אמונה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'הודו לה׳', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'שמחת החיים', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'ברכת הבנים', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'עת רצון', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'נעים זמירות', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תפילה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'שבח והודאה', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'חסד ה׳', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'גאולה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
+      { title: 'Happy Hits', url: 'https://open.spotify.com/playlist/37i9dQZF1DXdPec7aLTABCs', type: 'Music', icon: '🎵' },
+      { title: 'Feel Good Pop', url: 'https://open.spotify.com/playlist/37i9dQZF1DX1s9bkj5AkUo', type: 'Music', icon: '😊' },
+      { title: 'Upbeat Indie', url: 'https://open.spotify.com/playlist/37i9dQZF1DX2sUQwD7tbmL', type: 'Music', icon: '🎸' },
+      { title: 'Dance Party', url: 'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M', type: 'Music', icon: '💃' }
     ],
     sad: [
-      { title: 'אבינו מלכנו', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'רחם', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תשובה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אל מלא רחמים', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'זכרנו לחיים', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'סליחות', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אשמנו', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תפילת הדרך', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'רפאנו', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'יזכור', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'נחמה', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אל נא רפא נא לה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תחנונים', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'שמע קולנו', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'בקשה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אם אשכחך ירושלים', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'על נהרות בבל', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'זכור רחמיך', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תקון חצות', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'קינות', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'יום כיפור', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'ווידוי', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'צום גדליה', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תענית', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'אבל', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'זכרון', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תפילה לחולה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'רפואה שלמה', artist: 'אברהם פריד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'מי שברך', artist: 'מרדכי בן דוד', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-      { title: 'תחינה', artist: 'יעקב שוואקי', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
+      { title: 'Sad Songs', url: 'https://open.spotify.com/playlist/37i9dQZF1DX3YSRoSdA634', type: 'Music', icon: '😢' },
+      { title: 'Melancholy Vibes', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🎹' },
+      { title: 'Emotional Ballads', url: 'https://open.spotify.com/playlist/37i9dQZF1DX7qK8ma5wgG1', type: 'Music', icon: '🎤' },
+      { title: 'Chill & Reflective', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '🌙' }
+    ],
+    excited: [
+      { title: 'Energy Boost', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76t638V6CA8', type: 'Music', icon: '⚡' },
+      { title: 'Workout Motivation', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76Wlfd25lzL', type: 'Music', icon: '💪' },
+      { title: 'High Energy Pop', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🔥' },
+      { title: 'Pump Up Songs', url: 'https://open.spotify.com/playlist/37i9dQZF1DX1lVhptIYRda', type: 'Music', icon: '🎧' }
+    ],
+    calm: [
+      { title: 'Peaceful Piano', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '🎹' },
+      { title: 'Calm & Focused', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🧘' },
+      { title: 'Ambient Relaxation', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4u5kfs0cCFN', type: 'Music', icon: '🌊' },
+      { title: 'Soft Acoustic', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🎸' }
+    ],
+    anxious: [
+      { title: 'Calming Sounds', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '🫁' },
+      { title: 'Stress Relief', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🌿' },
+      { title: 'Meditation Music', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4u5kfs0cCFN', type: 'Music', icon: '🧘' },
+      { title: 'Nature Sounds', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '🌲' }
+    ],
+    tired: [
+      { title: 'Sleep & Relax', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO', type: 'Music', icon: '😴' },
+      { title: 'Bedtime Stories', url: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadg8KxB', type: 'Music', icon: '🌙' },
+      { title: 'Deep Sleep', url: 'https://open.spotify.com/playlist/37i9dQZF1DX4u5kfs0cCFN', type: 'Music', icon: '💤' },
+      { title: 'Peaceful Night', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '⭐' }
+    ],
+    energetic: [
+      { title: 'Workout Mix', url: 'https://open.spotify.com/playlist/37i9dQZF1DX76t638V6CA8', type: 'Music', icon: '💪' },
+      { title: 'Power Hour', url: 'https://open.spotify.com/playlist/37i9dQZF1DX1lVhptIYRda', type: 'Music', icon: '⚡' },
+      { title: 'High Energy', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🔥' },
+      { title: 'Pump It Up', url: 'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M', type: 'Music', icon: '🎧' }
     ]
   };
 
+  // Determine mood category
+  let selectedPlaylists = [];
   if (moodLower.includes('happy') || moodLower.includes('joy') || moodLower.includes('cheerful')) {
-    return songLists.happy;
+    selectedPlaylists = spotifyPlaylists.happy;
   } else if (moodLower.includes('sad') || moodLower.includes('down') || moodLower.includes('melancholy')) {
-    return songLists.sad;
+    selectedPlaylists = spotifyPlaylists.sad;
+  } else if (moodLower.includes('excited') || moodLower.includes('enthusiastic') || moodLower.includes('thrilled')) {
+    selectedPlaylists = spotifyPlaylists.excited;
+  } else if (moodLower.includes('calm') || moodLower.includes('peaceful') || moodLower.includes('serene')) {
+    selectedPlaylists = spotifyPlaylists.calm;
+  } else if (moodLower.includes('anxious') || moodLower.includes('worried') || moodLower.includes('nervous')) {
+    selectedPlaylists = spotifyPlaylists.anxious;
+  } else if (moodLower.includes('tired') || moodLower.includes('exhausted') || moodLower.includes('sleepy')) {
+    selectedPlaylists = spotifyPlaylists.tired;
+  } else if (moodLower.includes('energetic') || moodLower.includes('active') || moodLower.includes('vibrant')) {
+    selectedPlaylists = spotifyPlaylists.energetic;
   } else {
-    return songLists.happy; // Default to happy songs
+    // Default/neutral mood - general music discovery
+    selectedPlaylists = [
+      { title: 'Discover Weekly', url: 'https://open.spotify.com/playlist/37i9dQZ1DXcBWIGoYBM5M', type: 'Music', icon: '🎵' },
+      { title: 'Today\'s Top Hits', url: 'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M', type: 'Music', icon: '🔥' },
+      { title: 'Chill Hits', url: 'https://open.spotify.com/playlist/37i9dQZF1DX889U0CL85jj', type: 'Music', icon: '🌊' },
+      { title: 'Pop Mix', url: 'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd', type: 'Music', icon: '🎤' }
+    ];
   }
+
+  // Adjust number of playlists based on confidence (minimum 2, maximum all)
+  const numPlaylists = confidence > 0.7 ? selectedPlaylists.length : Math.max(2, Math.floor(selectedPlaylists.length * confidence));
+  
+  return selectedPlaylists.slice(0, numPlaylists);
 };
+
