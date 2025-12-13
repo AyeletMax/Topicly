@@ -165,21 +165,60 @@ const MoodAnalyzer = () => {
             {moodData.links && moodData.links.length > 0 && (
               <div className="links-section">
                 <h3>🎵 Recommended Songs for Your Mood:</h3>
-                <p className="links-subtitle">Open these Spotify playlists to listen to music that matches your mood</p>
                 <div className="links-grid">
-                  {moodData.links.map((link, index) => (
-                    <a
-                      key={index}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link-card spotify-card"
-                    >
-                      <span className="link-icon">{link.icon || '🎵'}</span>
-                      <span className="link-title">{link.title}</span>
-                      <span className="spotify-badge">🎧 Spotify</span>
-                    </a>
-                  ))}
+                  {moodData.links.map((raw, index) => {
+                    // הדפסה לדיבאג
+                    console.log('Raw Gemini link:', raw);
+                    // ניקוי והפקה
+                    let line = String(raw).trim();
+                    // נסה למצוא לינק
+                    let url = '';
+                    const urlMatch = line.match(/(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)[^\s]*)/i);
+                    if (urlMatch) url = urlMatch[1];
+                    // נחלץ title אם יש
+                    let title = `Song #${index + 1}`;
+                    const titleMatch = line.match(/Title:([^\n\r]*)/i);
+                    if (titleMatch) title = titleMatch[1].trim();
+                    // YouTube video ID
+                    let embedId = null;
+                    if (url) {
+                      // youtube.com/watch?v=VIDEO_ID&... or youtu.be/VIDEO_ID
+                      const ytIdMatch = url.match(/(?:v=|be\/)([a-zA-Z0-9_-]{11})/);
+                      if (ytIdMatch) embedId = ytIdMatch[1];
+                    }
+                    return (
+                      <div key={index} className="yt-embed-card">
+                        <div className="yt-title">{title}</div>
+                        {embedId ? (
+                          <iframe
+                            width="340"
+                            height="192"
+                            src={`https://www.youtube.com/embed/${embedId}`}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            title={`YouTube Song ${index+1}`}
+                            className="yt-iframe"
+                          />
+                        ) : (
+                          <div style={{ color: 'red', minHeight: 32 }}>
+                            ⚠️ Unable to display song preview
+                            <br />
+                            {url ? (
+                              <span style={{fontSize:'90%'}}>The link is not a valid YouTube song link.<br/>{url}</span>
+                            ) : (
+                              <span style={{fontSize:'90%'}}>No YouTube link detected in Gemini reply.<br/>{raw}</span>
+                            )}
+                          </div>
+                        )}
+                        <div>
+                          <a href={url || '#'} target="_blank" rel="noopener noreferrer" className="link-card">
+                            🎬 Open on YouTube
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

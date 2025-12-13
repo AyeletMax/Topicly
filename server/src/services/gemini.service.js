@@ -251,3 +251,50 @@ OUTPUT FORMAT - JSON only, no other text:
     throw new Error(`Gemini mood analysis failed: ${error.message}`);
   }
 };
+
+/**
+ * Get 3 YouTube song links for a given mood, tailored for the Haredi (חרדי) community.
+ * @param {string} mood - The mood (in Hebrew or English)
+ * @returns {Promise<string[]>} Array of YouTube links (as strings). Returns empty array if none found.
+ */
+exports.getHarediSongsByMoodWithGemini = async (mood) => {
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not set in environment variables');
+    }
+
+    // Use the latest Gemini text model
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.9,
+        topK: 40,
+      },
+    });
+
+    const prompt = `
+Give me 3 direct YouTube links to songs by Yaakov Shwekey that fit the mood: ${mood} and are 100% appropriate for the Haredi (ultra-Orthodox Jewish) community.
+Only provide full valid YouTube links in the following format, with nothing else:
+https://www.youtube.com/watch?v=XXXXXXXXXXX
+No explanations, no song titles, no extra words. Just three valid YouTube URLs, one on each line.
+Only include videos that are definitely by Yaakov Shwekey!`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = await response.text();
+
+    // חיתוך הקישורים מתוך הטקסט, יתפוס הפורמט שמתחיל בקישור יוטיוב בלבד בכל שורה
+    const youtubeLinks = [];
+    const lines = text.split('\n');
+    for (const line of lines) {
+      // חפש שורה שמתחילה בקישור יוטיוב או מכילה קישור ביוטיוב
+      const match = line.match(/(https?:\/\/(www\.)?youtube\.com\S+|https?:\/\/youtu\.be\S+)/i);
+      if (match) youtubeLinks.push(match[0]);
+    }
+    return youtubeLinks.slice(0, 3); // תחזיר עד 3 קישורים בלבד
+  } catch (error) {
+    console.error('Gemini Haredi Songs Error:', error);
+    return [];
+  }
+};
